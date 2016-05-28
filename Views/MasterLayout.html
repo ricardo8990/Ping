@@ -1,0 +1,144 @@
+<!DOCTYPE HTML>
+<html>
+   <head lang="en">
+      {% block head %}
+      <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>{% block title %}Home Layout{% endblock %}</title>
+      {% endblock %}
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="Track and album reviews from users" />
+      <meta name="keywords" content="track, reviews, album" />
+
+      <link href="/content/css/bootstrap.min.css" rel="stylesheet"/>
+       <link href="/content/css/bootstrap-dialog.css" rel="stylesheet"/>
+      <link href="/content/css/bootstrap-theme.min.css" rel="stylesheet"/>
+      <link href="/content/css/master.css" rel="stylesheet"/>
+      {% block style %} {# we can change style in layouts inheriting from this one #}
+
+      {% endblock %}
+      <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+   </head>
+   <body>
+   <div id="wrapper">
+      <div class="container">
+          <!-- Header -->
+          <header id="header">
+            <div class="user">
+                <a href="/review/user/" class="btn btn-sm btn-info">My reviews</a>
+            </div>
+            <div id="logo" class="logo">
+                <a href="/">
+                    <img alt="Peksil" height="109" longdesc="Track and album reviews from users" src="/content/Images/Logo.png" width="270" />
+                </a>
+            </div>
+            <form method="get" autocomplete="off">
+                <div id="searchBox" class="searchBox">
+                    <input type="text" id="search" size="50" class="typeahead" maxlength="70" autocomplete="off" placeholder="Search for tracks or albums"/>
+                    <input type="submit" id="submitSearch" value=""/>
+                </div>
+            </form>
+                <div class="theme-showcase report">
+                  <a href="/new/review/" type="submit" class="btn btn-lg btn-primary">New review</a>
+                </div>
+          </header>
+          <div id="main">
+             {% block content %}
+
+             {# block reserved for main content #}
+             {# content is added in layouts inheriting from this one  #}
+
+             {% endblock %}
+          </div>
+      </div>
+      <div id="push"></div>
+   </div>
+  <!-- Footer -->
+  <div id="footer">
+      <div class="container">
+          <ul class="actions">
+              <li><a href="https://twitter.com/ricardo_8990" class="fa solo fa-twitter" target="_blank"><span>Twitter</span></a></li>
+              <li><a href="http://www.linkedin.com/pub/ricardo-s%C3%A1nchez-castillo/78/444/334" class="fa solo fa-linkedin" target="_blank"><span>LinkedIn</span></a></li>
+              <li><a href="https://www.google.com/+RicardoSanchez8990" class="fa solo fa-google-plus" target="_blank"><span>Google+</span></a></li>
+              <li><a href="http://instagram.com/ricardo_8990" class="fa solo fa-instagram" target="_blank"><span>Instagram</span></a></li>
+              <li><a href="https://github.com/ricardo8990" class="fa solo fa-github" target="_blank"><span>Github</span></a></li>
+          </ul>
+
+          <!-- Menu -->
+          <ul class="menu">
+              <li><a href="http://rsanchezc.com/" target="_blank"> &copy; Ricardo Sánchez</a></li>
+          </ul>
+      </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/Scripts/bootstrap.min.js"></script>
+  <script src="/Scripts/bootstrap-dialog.js"></script>
+  <script src="/Scripts/typeahead.bundle.js"></script>
+  <script src="/Scripts/Forza.js"></script>
+  <script src="http://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+  <script src="http://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
+  <script>
+    var tracks = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      remote: '/search/track/%QUERY/'
+    });
+
+    var albums = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('team'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      remote: '/search/album/%QUERY/'
+    });
+
+    tracks.initialize();
+    albums.initialize();
+
+    $('#searchBox .typeahead').typeahead({
+          highlight: true
+        },
+        {
+          name: 'tracks',
+          displayKey: 'track',
+          source: tracks.ttAdapter(),
+          templates: {
+            header: '<h3 class="searchBoxResults">Tracks</h3>',
+            empty: [
+              '<p class="searchBoxResults">No tracks found</p>'
+            ].join('\n')
+          }
+        },
+        {
+          name: 'albums',
+          displayKey: 'album',
+          source: albums.ttAdapter(),
+          templates: {
+            header: '<h3 class="searchBoxResults">Albums</h3>',
+            empty: [
+              '<p class="searchBoxResults">No albums found</p>'
+            ].join('\n')
+          }
+    });
+
+    $('#searchBox .typeahead').on("typeahead:selected typeahead:autocompleted", function(e,datum) {
+        var element = datum.id;
+        var url = "";
+        if(datum.track){
+            url = "/review/track/";
+        }
+        else{
+            url = "/review/album/";
+        }
+        window.location = url + element;
+    })
+
+    {% block script %}
+
+     {# block for javascripts #}
+
+    {% endblock %}
+  </script>
+   </body>
+</html>

@@ -1,0 +1,29 @@
+application: ping
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+handlers:
+- url: /static/
+  static_dir: static
+
+- url: /content/css/
+  static_dir: content/css
+
+- url: /content/Images/
+  static_dir: content/Images
+
+- url: /content/fonts/
+  static_dir: content/fonts
+
+- url: /Scripts/
+  static_dir: Scripts
+
+- url: /.*
+  script: url.app
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest

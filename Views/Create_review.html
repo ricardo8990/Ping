@@ -1,0 +1,269 @@
+{% extends "MasterLayout.html" %}
+
+{% block title %} Ping-New review {% endblock %}  {# changing title #}
+
+{% block content %} {# adding main content #}
+
+<!-- Main content -->
+<div id="content">
+    <form id="newReviewForm" action="/new/review/" method="post" class="form-horizontal" role="form">
+        <div class="alert alert-success hidden" role="alert" id="trackCreated">
+            Track successfully created.
+        </div>
+        <div class="form-group">
+          <label for="user" class="col-sm-2 control-label">User</label>
+          <div class="col-sm-10">
+            <input type="text" name="user" class="form-control" id="user" placeholder="User" required>
+          </div>
+        </div>
+        <div class="form-group" id="divTracks">
+          <label for="track" class="col-sm-2 control-label">Track</label>
+          <div class="col-sm-10">
+            <input type="text" class="typeahead form-control" id="track" placeholder="Track" required/>
+            <input type="hidden" name="track" id="trackCommentHidden">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="Comment" class="col-sm-2 control-label">Comment</label>
+          <div class="col-sm-10">
+            <textarea name="comment" class="form-control" id="comment" rows=3 placeholder="Comment" required></textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="rank" class="col-sm-2 control-label">Rank</label>
+          <div class="col-sm-10">
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio1" value="1" required> 1
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio2" value="2"> 2
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio3" value="3"> 3
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio4" value="4"> 4
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio5" value="5"> 5
+            </label>
+            <label for="rank" class="error" style="display:none;"></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-success">Create</button>
+          </div>
+        </div>
+    </form>
+
+    <div id="divNewAlbum" class="hide">
+    <form id="newAlbum" action="/new/album/" method="post" class="form-horizontal" role="form">
+      <div class="alert alert-danger hide" role="danger" id="albumError">
+        All fields are required
+      </div>
+      <div class="form-group">
+        <label for="nameAlbum" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-10">
+          <input type="text" name="name" class="form-control" id="nameAlbum" placeholder="Name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="albumArtist" class="col-sm-2 control-label">Artist</label>
+        <div class="col-sm-10">
+          <input type="text" name="artist" class="form-control" id="albumArtist" placeholder="Artist">
+        </div>
+      </div>
+    </form>
+  </div>
+
+    <div id="dialog-form-track" title="Create new Track" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="myModalLabel">New Track</h4>
+          </div>
+          <div class="modal-body">
+            <form id="newTrack" action="/new/track/" method="post" class="form-horizontal" role="form">
+              <div class="alert alert-success hidden" role="alert" id="albumCreated">
+                Album successfully created.
+              </div>
+              <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">Name</label>
+                <div class="col-sm-10">
+                  <input type="text" name="name" class="form-control" id="name" placeholder="Name" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="trackArtist" class="col-sm-2 control-label">Artist</label>
+                <div class="col-sm-10">
+                  <input type="text" name="artist" class="form-control" id="trackArtist" placeholder="Artist" required>
+                </div>
+              </div>
+              <div class="form-group" id="divAlbums">
+                <label for="trackAlbum" class="col-sm-2 control-label">Album</label>
+                <div class="col-sm-10">
+                  <input type="text" class="typeahead form-control" id="trackAlbum" placeholder="Album" required>
+                  <input type="hidden" name="album" id="albumTrackHidden">
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success" id="createTrack">Create</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+var form = $("#newReviewForm");
+form.validate();
+
+var trackForm = $("#newTrack");
+trackForm.validate();
+
+var content = $("#divNewAlbum").html();
+$("body").on("click", "#createAlbum", function() {
+  CreateAlbum("New Album", content, sendAlbumPost);
+});
+
+$("body").on("click", "#createTrack", function(){
+        var name = $("#newTrack #name").last().val();
+        var artist = $("#newTrack #trackArtist").last().val();
+        var album = $("#newTrack #albumTrackHidden").last().val();
+        if(!trackForm.valid())
+          {
+            return;
+          }
+        $.ajax({
+          type: "POST",
+          url: "/new/track/",
+          datatype: 'json',
+          data: JSON.stringify({"name": name, "artist": artist, "album": album})
+        })
+        .done(function(data){
+          var a = JSON.parse(data);
+          $('#track').val(a['name']);
+          $('#trackCommentHidden').val(a['id']);
+          $('#dialog-form-track').modal('hide');
+          $('#trackCreated').removeClass('hidden');
+        });
+      })
+
+function CreateAlbum(title, content, callback) {
+  var $content = $(content);
+  var dlg = new BootstrapDialog({
+      title: title,
+      message: $content,
+      draggable: true,
+      onshown: function(dialog) {
+          var tier = $('.bootstrap-dialog').length - 1;
+          dialog.$modal.prev(".modal-backdrop")
+              .css("z-index", 1030 + tier * 30);
+          dialog.$modal
+              .css("z-index", 1040 + tier * 30);
+      },
+      buttons: [{
+          label: 'Create',
+          cssClass: 'btn-primary',
+          action: function (dialog) {
+              if (callback !== "") {
+                if(callback() == true)
+                  dialog.close();
+              }
+              else dialog.close();
+          }
+      },{
+          label: 'Close',
+          cssClass: 'btn',
+          action: function (dialog) {
+              dialog.close();
+          }
+      }]
+  }).open();
+}
+
+function sendAlbumPost(){
+        var name = $("#newAlbum #nameAlbum").last().val();
+        var artist = $("#newAlbum #albumArtist").last().val();
+        if(isEmpty(name) || isBlank(name) || name.isEmpty() || isEmpty(artist) || isBlank(artist) || artist.isEmpty() )
+          {
+            $("#newAlbum #albumError").removeClass("hide");
+            return false;
+          }
+        $("#newAlbum #albumError").addClass("hide");
+        $.ajax({
+          type: "POST",
+          url: "/new/album/",
+          datatype: 'json',
+          data: JSON.stringify({"name": name, "artist": artist})
+        })
+        .done(function(data){
+          var a = JSON.parse(data);
+          $('#trackAlbum').val(a['name']);
+          $('#albumTrackHidden').val(a['id']);
+          $('#albumCreated').removeClass('hidden');
+        });
+        return true;
+      }
+
+var tracks = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  /*prefetch: '/search/track',*/
+  remote: '/search/track/%QUERY/'
+});
+
+tracks.initialize();
+
+$('#divTracks .typeahead').typeahead(null, {
+  name: 'tracks',
+  displayKey: 'track',
+  source: tracks.ttAdapter(),
+  templates: {
+    empty: [
+      '<div class="empty-message">',
+      '<a data-toggle="modal" data-target="#dialog-form-track">Create new Track</a>',
+      '</div>'
+    ].join('\n')
+  }
+});
+
+$('#divTracks .typeahead').on("typeahead:selected typeahead:autocompleted", function(e,datum) {
+    $('#trackCommentHidden').val(datum.id);
+})
+
+var albums = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  /*prefetch: '/search/album',*/
+  remote: '/search/album/%QUERY/'
+});
+
+albums.initialize();
+
+$('#divAlbums .typeahead').typeahead(null, {
+  name: 'albums',
+  displayKey: 'album',
+  source: albums.ttAdapter(),
+  templates: {
+    empty: [
+      '<div class="empty-message">',
+      '<a data-toggle="modal" id="createAlbum" data-target="#dialog-form-album">Create new Album</a>',
+      '</div>'
+    ].join('\n')
+  }
+});
+
+$('#divAlbums .typeahead').on("typeahead:selected typeahead:autocompleted", function(e,datum) {
+    $('#albumTrackHidden').val(datum.id);
+})
+
+{% endblock %}

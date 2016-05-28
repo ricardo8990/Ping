@@ -1,0 +1,111 @@
+{% extends "MasterLayout.html" %}
+
+{% block title %} Peksil {% endblock %}  {# changing title #}
+
+{% block content %} {# adding main content #}
+
+<!-- Main content -->
+<div class="row">
+    <div id="content" class="col-md-8">
+        <div id="comments">
+            {% if comments %}
+                <div id="reviews" class="page-header row">
+                    <div class="col-md-8">
+                      <h2>Lastest reviews</h2>
+                    </div>
+                    <div class="dropdown theme-dropdown clearfix col-md-4">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        <h3>Order by <span class="caret"></span></h3>
+                      </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                        <li role="presentation" {{ '%s' % 'class=active' if orderBy == 'dtCreated' }}>
+                          <a role="menuitem" tabindex="-1" href="/?order_by=dtCreated">Date</a>
+                        </li>
+                        <li role="presentation" {{ '%s' % 'class=active' if orderBy == 'rank' }}>
+                          <a role="menuitem" tabindex="-1" href="?order_by=rank">Rank</a>
+                        </li>
+                    </ul>
+                    </div>
+                </div>
+                <div id="commentList">
+                {% for comment in comments %}
+                    <div class="post panel panel-info">
+                      <div class="panel-heading">
+                        <div class="row">
+                          <div class="col-md-8">
+                            <a href="/review/track/{{comment.track}}/"> <h2>{{comment.name_track}}</h2></a>
+                            <div class="postData">
+                              <div class="postDate">
+                                <h5>{{comment.dtCreated}}</h5>
+                              </div>
+                              <div class="postTitle">
+                                <h4>{{comment.artist_track}}</h4>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-4">
+                            <div class="rank">
+                              {% for r in range(5 - comment.rank) %}
+                                <span>☆</span>
+                              {% endfor %}
+                              {% for r in range(comment.rank) %}
+                                <span>★</span>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                        <div class="panel-body review">
+                          <p>{{comment.comment}}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+              </div>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    There is no comments yet. <a href="/new/review/">What about create a new one?.</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="side" class="col-md-4">
+        <div id="artist" class="panel panel-primary post">
+          <div class="panel-heading">
+            <h3 class="panel-title">Most popular tracks</h3>
+          </div>
+          <div>
+            {% if tracks %}
+                <ul class="list-group">
+                    {% for track in tracks %}
+                        <li class="list-group-item"><a href="/review/track/{{track.urlId}}">{{track.name}}</a></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+              <div class="panel-body">
+                <p>No tracks created</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        <div id="albums" class="panel panel-primary post">
+          <div class="panel-heading">
+            <h3 class="panel-title">Most popular albums</h3>
+          </div>
+          <div>
+            {% if albums %}
+                <ul class="list-group">
+                    {% for album in albums %}
+                    <li class="list-group-item"><a href="/review/album/{{album.urlId}}">{{album.name}}</a> </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+              <div class="panel-body">
+                <p>No albums created</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

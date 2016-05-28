@@ -1,0 +1,7 @@
+cron:
+- description: Update track ranks
+  url: /tasks/track
+  schedule: every 5 minutes
+- description: Update album ranks
+  url: /tasks/album
+  schedule: every 5 minutes

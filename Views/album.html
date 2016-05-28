@@ -1,0 +1,139 @@
+{% extends "MasterLayout.html" %}
+
+{% block title %} Ping-Track reviews {% endblock %}  {# changing title #}
+
+{% block content %} {# adding main content #}
+
+<!-- Main content -->
+<div id="content">
+    <div id="album" class="jumbotron">
+      <div id="image" class="col-md-4">
+          {% if image %}
+            <img src="{{image}}" height="100%">
+          {% endif %}
+      </div>
+      <div id="albumInfo" class="col-md-8">
+        <h1>{{album.name}}</h1>
+        <h2>{{album.artist}}</h2>
+        <p>Created {{album.dtCreated}}</p>
+        <p>Rank {{album.rank}} with {{album.number_comments}} reviews</p>
+      </div>
+    </div>
+    <div id="tracks" class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Song</th>
+                    <th>Rank</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for track in tracks %}
+                <tr>
+                    <td><a href="/review/track/{{track.urlId}}">{{track.name}}</a></td>
+                    <td>{{track.rank}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div id="newReview" class="col-md-12">
+      <form id="newReviewForm" method="post" action="/new/review-album/" class="form-inline" role="form">
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" name="user" class="form-control" id="user" placeholder="Enter User" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" name="comment" class="form-control" id="comment" placeholder="Enter Comment" required>
+            <input type="hidden" name="album" value="{{album.urlId}}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="rank" class="col-sm-2 control-label">Rank</label>
+          <div class="col-sm-10">
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio1" value="1" required> 1
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio2" value="2"> 2
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio3" value="3"> 3
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio4" value="4"> 4
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="rank" id="inlineRadio5" value="5"> 5
+            </label>
+            <label for="rank" class="error" style="display:none;"></label>
+          </div>
+        </div>
+        <input type="submit" class="btn btn-success" value="Create"/>
+      </form>
+    </div>
+      {% if comments %}
+        <div id="reviews" class="page-header row">
+            <div class="col-md-8">
+              <h1>Reviews</h1>
+            </div>
+            <div class="dropdown theme-dropdown clearfix col-md-4">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                <h3>Order by <span class="caret"></span></h3>
+              </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                <li role="presentation" {{ '%s' % 'class=active' if orderBy == 'dtCreated' }}>
+                  <a role="menuitem" tabindex="-1" href="?order_by=dtCreated">Date</a>
+                </li>
+                <li role="presentation" {{ '%s' % 'class=active' if orderBy == 'rank' }}>
+                  <a role="menuitem" tabindex="-1" href="?order_by=rank">Rank</a>
+                </li>
+            </ul>
+            </div>
+        </div>
+        {% for comment in comments %}
+         <div class="post panel panel-info">
+          <div class="panel-heading">
+            <div class="row">
+              <div class="col-md-8">
+                <a href="/review/user/{{comment.user}}/"> <h2>{{comment.user}}</h2></a>
+                <div class="postData">
+                  <div class="postDate">
+                    <h5>{{comment.dtCreated}}</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="rank">
+                  {% for r in range(5 - comment.rank) %}
+                    <span>☆</span>
+                  {% endfor %}
+                  {% for r in range(comment.rank) %}
+                    <span>★</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+            <div class="panel-body review">
+              <p>{{comment.comment}}</p>
+            </div>
+        </div>
+      {% endfor %}
+      {% else %}
+      <div class="alert alert-warning col-md-12" role="alert">
+          No comments....yet.
+      </div>
+      {% endif %}
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+var form = $("#newReviewForm");
+form.validate();
+
+{% endblock %}

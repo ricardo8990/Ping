@@ -1,0 +1,90 @@
+{% extends "MasterLayout.html" %}
+
+{% block title %} Ping-My reviews {% endblock %}  {# changing title #}
+
+{% block content %} {# adding main content #}
+
+<!-- Main content -->
+<div id="content">
+    <div id="reviewForm" class="form-horizontal" role="form">
+        <div class="form-group">
+          <label for="user" class="col-sm-2 control-label">User</label>
+          <div class="col-sm-10">
+            <input type="text" name="user" class="form-control" id="user" placeholder="User">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-success" id="review">Review</button>
+          </div>
+        </div>
+    </div>
+    {% if comments %}
+    <div id="reviews" class="page-header row">
+        <div class="col-md-8">
+          <h1>Reviews of {{user}}</h1>
+        </div>
+        <div class="dropdown theme-dropdown clearfix col-md-4">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+            <h3>Order by <span class="caret"></span></h3>
+          </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+            <li role="presentation" {{ '%s' % 'class=active' if orderBy == 'dtCreated' }}>
+              <a role="menuitem" tabindex="-1" href="?order_by=dtCreated">Date</a>
+            </li>
+            <li role="presentation" {{ '%s' % 'class=active' if orderBy == 'rank' }}>
+              <a role="menuitem" tabindex="-1" href="?order_by=rank">Rank</a>
+            </li>
+        </ul>
+        </div>
+    </div>
+        {% for comment in comments %}
+            <div class="post panel panel-info">
+              <div class="panel-heading">
+                <div class="row">
+                  <div class="col-md-8">
+                    <a href="/review/track/{{comment.track}}/"> <h2>{{comment.name_track}}</h2></a>
+                    <div class="postData">
+                      <div class="postDate">
+                        <h5>{{comment.dtCreated}}</h5>
+                      </div>
+                      <div class="postTitle">
+                        <h4>{{comment.artist_track}}</h4>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="rank">
+                      {% for r in range(5 - comment.rank) %}
+                        <span>☆</span>
+                      {% endfor %}
+                      {% for r in range(comment.rank) %}
+                        <span>★</span>
+                      {% endfor %}
+                    </div>
+                    <a class="btn btn-danger" id="delete" href="/review/delete/{{comment.url_id}}">Delete</a>
+                  </div>
+                </div>
+              </div>
+                <div class="panel-body review">
+                  <p>{{comment.comment}}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% elif user %}
+        <div class="alert alert-warning" role="alert">
+            {{user}}, you don't have comments yet. <a href="/new/review/">What about create a new one?.</a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+$("body").on("click", "#review", function(){
+        var user = $("#user").val();
+        window.location = "/review/user/" + user;
+      })
+
+{% endblock %}
